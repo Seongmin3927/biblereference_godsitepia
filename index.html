@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>갓피아 성경구절 검색기 | Bible Reference</title>
+  <meta name="description" content="갓피아(godpia.com)의 성경 구절을 원하는 대로 검색하고 스크래핑하여 읽고 복사할 수 있는 웹 서비스">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📖</text></svg>">
+  
+  <!-- Pretendard Font & Noto Serif KR -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <div class="logo-area">
+          <span class="logo-icon">📖</span>
+          <div>
+            <h1 class="logo-title">갓피아 성경구절 검색기</h1>
+            <p class="logo-desc">Godpia Bible Scraper & Reader</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button id="themeToggleBtn" class="icon-btn" title="다크/라이트 모드 전환" aria-label="테마 전환">
+            <span id="themeIcon">🌙</span>
+          </button>
+          <a href="https://github.com/Seongmin3927/biblereference_godsitepia" target="_blank" rel="noopener noreferrer" class="icon-btn" title="GitHub 저장소" aria-label="깃허브 저장소">
+            <svg height="20" width="20" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Card -->
+    <main class="main-content">
+      <section class="card search-card">
+        <!-- Search Mode Tabs -->
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="text-search">⚡ 구절 직접 입력</button>
+          <button class="tab-btn" data-tab="select-search">📚 책·장·절 선택</button>
+        </div>
+
+        <!-- Mode 1: Natural Text Input -->
+        <div id="tab-text-search" class="tab-pane active">
+          <form id="textSearchForm" class="search-form">
+            <div class="input-row">
+              <div class="search-input-wrapper">
+                <span class="search-icon">🔍</span>
+                <input 
+                  type="text" 
+                  id="queryInput" 
+                  placeholder="예: 창세기 1:1, 요 3:16, 시편 23편, 롬 8:28, 고전 13:4-7" 
+                  autocomplete="off"
+                  autofocus
+                >
+                <button type="button" id="clearInputBtn" class="clear-btn" title="지우기" style="display:none;">✕</button>
+              </div>
+              <div class="version-select-wrapper">
+                <select id="textVersionSelect" class="styled-select" title="번역본 선택">
+                  <option value="gae" selected>개역개정4판</option>
+                  <option value="han">개역한글</option>
+                  <option value="saenew">새번역</option>
+                  <option value="easy">쉬운성경</option>
+                  <option value="hyun">현대인의성경</option>
+                  <option value="niv">NIV (English)</option>
+                  <option value="hebrew">히브리어(구약)</option>
+                  <option value="greek">헬라어(신약)</option>
+                </select>
+              </div>
+              <button type="submit" class="primary-btn search-submit-btn">
+                <span>구절 읽기</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Mode 2: Dropdown Selector -->
+        <div id="tab-select-search" class="tab-pane">
+          <form id="selectSearchForm" class="search-form">
+            <div class="selector-grid">
+              <div class="form-group">
+                <label for="testamentSelect">구분</label>
+                <select id="testamentSelect" class="styled-select">
+                  <option value="ALL">전체 (66권)</option>
+                  <option value="OT">구약 (39권)</option>
+                  <option value="NT">신약 (27권)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="bookSelect">성경 책</label>
+                <select id="bookSelect" class="styled-select">
+                  <!-- 동적 로드 -->
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="chapterSelect">장 (Chapter)</label>
+                <select id="chapterSelect" class="styled-select">
+                  <!-- 동적 로드 -->
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="verseRangeSelect">절 범위 (선택)</label>
+                <div class="verse-range-inputs">
+                  <input type="number" id="startVerseInput" placeholder="시작절" min="1" class="styled-input small">
+                  <span class="range-sep">~</span>
+                  <input type="number" id="endVerseInput" placeholder="끝절" min="1" class="styled-input small">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="selectVersionSelect">번역본</label>
+                <select id="selectVersionSelect" class="styled-select">
+                  <option value="gae" selected>개역개정4판</option>
+                  <option value="han">개역한글</option>
+                  <option value="saenew">새번역</option>
+                  <option value="easy">쉬운성경</option>
+                  <option value="hyun">현대인의성경</option>
+                  <option value="niv">NIV (English)</option>
+                  <option value="hebrew">히브리어(구약)</option>
+                  <option value="greek">헬라어(신약)</option>
+                </select>
+              </div>
+            </div>
+            <div class="selector-actions">
+              <button type="submit" class="primary-btn">
+                <span>구절 읽기</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Quick Recommend Chips -->
+        <div class="quick-chips-wrapper">
+          <span class="chips-label">자주 찾는 구절:</span>
+          <div class="chips-list">
+            <button class="chip-btn" data-query="창세기 1:1">창 1:1</button>
+            <button class="chip-btn" data-query="시편 23편">시편 23편</button>
+            <button class="chip-btn" data-query="요한복음 3:16">요 3:16</button>
+            <button class="chip-btn" data-query="로마서 8:28">롬 8:28</button>
+            <button class="chip-btn" data-query="빌립보서 4:13">빌 4:13</button>
+            <button class="chip-btn" data-query="이사야 41:10">사 41:10</button>
+            <button class="chip-btn" data-query="고린도전서 13:4-7">고전 13:4-7</button>
+            <button class="chip-btn" data-query="마태복음 5:3-10">마 5:3-10 (팔복)</button>
+            <button class="chip-btn" data-query="잠언 3:5-6">잠 3:5-6</button>
+            <button class="chip-btn" data-query="여호수아 1:9">수 1:9</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Status View: Loading -->
+      <div id="loadingView" class="status-box loading-box" style="display:none;">
+        <div class="spinner"></div>
+        <p class="status-msg">갓피아(godpia.com)에서 성경 구절을 가져오는 중입니다...</p>
+      </div>
+
+      <!-- Status View: Error -->
+      <div id="errorView" class="status-box error-box" style="display:none;">
+        <span class="status-icon">⚠️</span>
+        <div class="error-content">
+          <h3 id="errorTitle">구절을 불러오지 못했습니다</h3>
+          <p id="errorMessage"></p>
+        </div>
+      </div>
+
+      <!-- Result View: Bible Card -->
+      <section id="resultCard" class="card result-card" style="display:none;">
+        <div class="result-header">
+          <div class="result-title-group">
+            <h2 id="resultReference" class="result-ref">창세기 1:1</h2>
+            <div class="badges">
+              <span id="resultVersionBadge" class="badge version-badge">개역개정4판</span>
+              <span id="resultTestamentBadge" class="badge testament-badge">구약</span>
+            </div>
+          </div>
+          <div class="result-controls">
+            <div class="font-size-controls" title="글자 크기 조절">
+              <button id="fontSizeDecBtn" class="small-ctrl-btn" aria-label="글자 축소">가-</button>
+              <span id="fontSizeDisplay" class="font-size-text">100%</span>
+              <button id="fontSizeIncBtn" class="small-ctrl-btn" aria-label="글자 확대">가+</button>
+            </div>
+            <button id="printBtn" class="small-ctrl-btn" title="인쇄하기" aria-label="인쇄">
+              🖨️ 인쇄
+            </button>
+          </div>
+        </div>
+
+        <!-- Bible Verses Container -->
+        <div id="versesContainer" class="verses-container font-serif">
+          <!-- Verses will be inserted here -->
+        </div>
+
+        <!-- Result Footer Actions -->
+        <div class="result-footer">
+          <div class="nav-buttons">
+            <button id="prevChapBtn" class="nav-btn" title="이전 장으로 이동">
+              ← 이전 장 (<span id="prevChapText"></span>)
+            </button>
+            <button id="nextChapBtn" class="nav-btn" title="다음 장으로 이동">
+              다음 장 (<span id="nextChapText"></span>) →
+            </button>
+          </div>
+          <div class="share-buttons">
+            <button id="copyVersesBtn" class="action-btn copy-btn">
+              <span>📋 구절 복사하기</span>
+            </button>
+            <button id="shareUrlBtn" class="action-btn share-btn">
+              <span>🔗 링크 복사</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Information & Guide Footer -->
+      <footer class="footer-info">
+        <p>💡 본 서비스는 Cloudflare Pages Functions를 백엔드 프록시로 사용하여 <a href="https://www.godpia.com/read/reading.asp" target="_blank" rel="noopener noreferrer">갓피아(godpia.com)</a> 성경 본문을 실시간으로 파싱합니다.</p>
+        <p class="copyright">모든 성경 본문의 저작권은 해당 저작권자 및 갓피아(godpia.com)에 있습니다.</p>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
